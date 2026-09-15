@@ -1,0 +1,12 @@
+{
+  "base_model": "Agri-Sovereign-2B",
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "vocab_size": 152256,
+  "final_loss": 1.08,
+  "final_ppl": 2.94,
+  "trained_on_gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "training_time_sec": 8.32,
+  "steps_completed": 150,
+  "dataset": "TNAU Agritech Guides + Kisan Call Center Logs"
+}

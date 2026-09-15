@@ -1,0 +1,30 @@
+{
+  "peft_type": "LORA",
+  "base_model_name_or_path": "Agri-Sovereign-2B-Base",
+  "r": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "modules_to_save": [
+    "embed_tokens",
+    "lm_head"
+  ],
+  "bias": "none",
+  "task_type": "CAUSAL_LM",
+  "dataset_curriculum": [
+    "AI4Bharat_IndicCorpV2_Tamil (1.8B tokens)",
+    "AI4Bharat_Sangraha_Tamil (0.8B tokens)",
+    "TNAU_Agritech_Portal_Guides (0.5B tokens)",
+    "ICAR_CRIDA_Agrometeorology (0.35B tokens)",
+    "TNAU_KCC_Farmer_Logs (0.25B tokens)",
+    "Synthetic_Agronomic_Chains (0.4B tokens)"
+  ]
+}
