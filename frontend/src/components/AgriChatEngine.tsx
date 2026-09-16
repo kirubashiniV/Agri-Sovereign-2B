@@ -101,7 +101,7 @@ export default function AgriChatEngine() {
       id: 'welcome-1',
       sender: 'assistant',
       text: 'வணக்கம் உழவரே! 🙏 நான் **உழவன் சகாயக் (Agri-Sovereign-2B)**.\n\nஉங்கள் பயிரில் பூச்சி, நோய், உர மேலாண்மை அல்லது வானிலை தொடர்பான எந்தக் கேள்வியையும் தமிழில் கேட்கலாம். TNAU/ICAR அதிகாரப்பூர்வ வழிகாட்டலுடன் CIBRC சட்டப்பூர்வ பாதுகாப்பான மருந்து அளவுகளை உடனடியாகப் பெறுங்கள்.',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: '10:00 AM',
       telemetry: {
         query_words: 34,
         tokens_consumed: 40,
@@ -479,7 +479,7 @@ export default function AgriChatEngine() {
                   )}
                 </div>
 
-                <div className="text-[11px] text-gray-400 font-mono">
+                <div className="text-[11px] text-gray-400 font-mono" suppressHydrationWarning>
                   {msg.timestamp}
                 </div>
               </div>
