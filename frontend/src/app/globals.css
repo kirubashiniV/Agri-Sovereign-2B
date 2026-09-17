@@ -1,55 +1,106 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-outfit: 'Outfit', sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-tamil: 'Noto Sans Tamil', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Institutional Deep Navy & Gold Design Tokens */
+  --navy-darkest: #050a17;
+  --navy-canvas: #070e22;
+  --navy-surface: #0c1836;
+  --navy-surface-elevated: #11224a;
+  --navy-soft: #172c5e;
+  --gold-accent: #f59e0b;
+  --gold-bright: #fbbf24;
+  --gold-soft: rgba(245, 158, 11, 0.15);
+  --emerald-accent: #10b981;
+  --border-subtle: rgba(59, 130, 246, 0.15);
+  --border-gold: rgba(245, 158, 11, 0.25);
 }
 
 body {
-  font-family: var(--font-outfit), var(--font-tamil), sans-serif;
-  background-color: #030705;
-  color: #e5e7eb;
+  font-family: var(--font-jakarta), var(--font-tamil), system-ui, -apple-system, sans-serif;
+  background-color: var(--navy-canvas);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.4) 0%, transparent 70%);
+  background-attachment: fixed;
+  color: #f1f5f9;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 .tamil-text {
-  font-family: var(--font-tamil), var(--font-outfit), sans-serif;
+  font-family: var(--font-tamil), var(--font-jakarta), sans-serif;
 }
 
-/* Glassmorphic UI Tokens */
+/* Institutional Navy Gradient */
+.bg-navy-gradient {
+  background: linear-gradient(150deg, #070e22 0%, #10214a 55%, #0b1736 100%);
+}
+
+.bg-navy-card {
+  background: linear-gradient(145deg, rgba(12, 24, 54, 0.85) 0%, rgba(8, 16, 38, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.bg-navy-card-gold {
+  background: linear-gradient(145deg, rgba(16, 32, 70, 0.9) 0%, rgba(12, 24, 54, 0.95) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.12);
+}
+
+/* Glassmorphic UI Panels */
 .glass-panel {
-  background: rgba(10, 22, 15, 0.75);
+  background: rgba(12, 24, 54, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(34, 197, 94, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .glass-panel-subtle {
-  background: rgba(13, 27, 18, 0.5);
+  background: rgba(10, 20, 46, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.12);
 }
 
 .glass-panel-hover {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-panel-hover:hover {
-  border-color: rgba(34, 197, 94, 0.4);
-  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.18);
   transform: translateY(-1px);
 }
 
 .glass-card-active {
-  background: rgba(22, 101, 52, 0.25);
-  border-color: rgba(74, 222, 128, 0.5);
-  box-shadow: 0 0 25px rgba(34, 197, 94, 0.2);
+  background: rgba(23, 44, 94, 0.6);
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+}
+
+/* Shadow utilities */
+.shadow-card-soft {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-gold-glow {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+}
+
+.shadow-emerald-glow {
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
 }
 
 /* WhatsApp Dark Theme Background Pattern */
@@ -71,33 +122,29 @@ body {
   border-top-right-radius: 2px;
 }
 
-/* Glowing Neon Utilities */
-.glow-emerald {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
-}
-
-.glow-amber {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
-}
-
-.glow-rose {
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.35);
-}
-
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #060e09;
+  background: #050a17;
 }
 ::-webkit-scrollbar-thumb {
-  background: #166534;
+  background: #172c5e;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #22c55e;
+  background: #f59e0b;
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Smooth message animations */

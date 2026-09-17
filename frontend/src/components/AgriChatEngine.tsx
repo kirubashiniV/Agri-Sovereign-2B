@@ -540,51 +540,58 @@ export default function AgriChatEngine() {
   }
 
   return (
-    <div className="flex flex-col h-full rounded-2xl glass-panel border border-agro-500/20 overflow-hidden shadow-2xl relative">
+    <div className="flex flex-col h-full rounded-2xl bg-gradient-to-b from-[#0a132c] via-[#0d1838] to-[#070e22] border border-blue-500/20 overflow-hidden shadow-2xl relative">
       
-      {/* Sleek Minimal Header */}
-      <div className="bg-[#07130b]/90 border-b border-agro-500/15 px-4 py-3 flex flex-wrap items-center justify-between gap-3 z-10">
+      {/* Sleek Institutional Header */}
+      <div className="bg-[#081026]/95 border-b border-blue-500/20 px-4 py-3 flex flex-wrap items-center justify-between gap-3 z-10 shadow-md">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-sm">
-            🌾
+          <div className="relative">
+            <img
+              src="/logo.png"
+              alt="Uzhavan Sahayak Logo"
+              className="w-10 h-10 rounded-xl object-cover border border-amber-400/50 shadow-md shadow-amber-500/10"
+            />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-[#081026] rounded-full" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-gray-100 flex items-center gap-2">
+            <h2 className="text-sm font-bold text-white flex items-center gap-2 font-tamil">
               உழவன் சகாயக் AI
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[10px] px-2 py-0.5 bg-amber-500/15 text-amber-300 font-mono font-semibold rounded-full border border-amber-500/30">
+                TNAU Grounded
+              </span>
             </h2>
-            <p className="text-[11px] text-gray-400">
-              TNAU & ICAR வழிகாட்டல் • CIBRC பூச்சிக்கொல்லி பாதுகாப்பு
+            <p className="text-[11px] text-amber-300/80 font-medium">
+              விவசாயிக்கு விழிப்புணர்வான தோழன் • CIBRC 1968 பாதுகாப்பு
             </p>
           </div>
         </div>
 
-        {/* Clean Selectors (No bulky pills) */}
-        <div className="flex items-center space-x-3 text-xs">
-          <div className="flex items-center space-x-1.5 text-gray-300">
-            <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+        {/* Farmer District & Crop Filter Pills */}
+        <div className="flex items-center space-x-2.5 text-xs">
+          <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/80 border border-blue-500/30 text-gray-200 shadow-sm">
+            <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <select
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
-              className="bg-transparent text-xs font-medium text-gray-200 outline-none cursor-pointer border-b border-gray-700 hover:border-emerald-500 pb-0.5"
+              className="bg-transparent text-xs font-semibold text-amber-200 outline-none cursor-pointer"
             >
               {DISTRICTS.map((d) => (
-                <option key={d} value={d} className="bg-[#0a160f] text-gray-200">
+                <option key={d} value={d} className="bg-[#0b1736] text-gray-100">
                   {d}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center space-x-1.5 text-gray-300">
-            <Sprout className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/80 border border-blue-500/30 text-gray-200 shadow-sm">
+            <Sprout className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             <select
               value={crop}
               onChange={(e) => setCrop(e.target.value)}
-              className="bg-transparent text-xs font-medium text-gray-200 outline-none cursor-pointer border-b border-gray-700 hover:border-emerald-500 pb-0.5"
+              className="bg-transparent text-xs font-semibold text-emerald-300 outline-none cursor-pointer"
             >
               {CROPS.map((c) => (
-                <option key={c} value={c} className="bg-[#0a160f] text-gray-200">
+                <option key={c} value={c} className="bg-[#0b1736] text-gray-100">
                   {c}
                 </option>
               ))}
@@ -602,12 +609,37 @@ export default function AgriChatEngine() {
                 },
               ])
             }
-            title="உரையாடலை மீட்டமைக்க"
-            className="p-1.5 text-gray-400 hover:text-gray-200 transition-colors"
+            title="உரையாடலை மீட்டமைக்க (Reset Chat)"
+            className="p-2 rounded-xl bg-slate-900/60 border border-blue-500/20 text-gray-400 hover:text-amber-300 hover:bg-slate-800 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
+      </div>
+
+      {/* Quick Crop Selector Ribbon for Quick Filtering */}
+      <div className="px-4 py-2 bg-[#060d20]/80 border-b border-blue-500/10 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
+        <span className="text-[11px] font-semibold text-amber-400/90 whitespace-nowrap mr-1">
+          பயிர் தெரிவு:
+        </span>
+        {CROPS.map((c, idx) => {
+          const isSelected = crop === c
+          const cropName = c.split(' ')[0]
+          const cropTamil = c.split('(')[1]?.replace(')', '') || c
+          return (
+            <button
+              key={idx}
+              onClick={() => setCrop(c)}
+              className={`px-2.5 py-1 rounded-lg text-xs whitespace-nowrap transition-all flex items-center gap-1 ${
+                isSelected
+                  ? 'bg-amber-500/20 border border-amber-500/50 text-amber-200 font-bold shadow-sm'
+                  : 'bg-slate-900/60 border border-white/5 text-gray-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <span>{cropTamil}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Messages Feed Area */}
@@ -621,19 +653,21 @@ export default function AgriChatEngine() {
           >
             {/* Message Bubble Container */}
             <div
-              className={`max-w-[88%] md:max-w-[78%] rounded-2xl p-4 transition-all ${
+              className={`max-w-[88%] md:max-w-[78%] rounded-2xl p-4 transition-all shadow-lg ${
                 msg.sender === 'farmer'
-                  ? 'bg-emerald-950/80 border border-emerald-500/30 text-gray-100 rounded-tr-sm'
-                  : 'bg-[#09150e]/90 border border-white/10 text-gray-200 rounded-tl-sm'
+                  ? 'bg-gradient-to-br from-blue-900/90 to-slate-900/95 border border-blue-400/40 text-gray-100 rounded-tr-sm shadow-blue-950/40'
+                  : 'bg-gradient-to-br from-[#0c193a]/95 to-[#070f24]/95 border border-amber-500/25 text-gray-100 rounded-tl-sm shadow-black/40'
               }`}
             >
               {/* Message Header */}
-              <div className="flex items-center justify-between gap-3 mb-2 pb-1.5 border-b border-white/5 text-xs">
-                <div className="flex items-center space-x-2 text-gray-400">
+              <div className="flex items-center justify-between gap-3 mb-2 pb-1.5 border-b border-white/10 text-xs">
+                <div className="flex items-center space-x-2 text-gray-300">
                   {msg.sender === 'farmer' ? (
                     <>
-                      <User className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="font-semibold text-emerald-300">விவசாயி</span>
+                      <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <User className="w-3.5 h-3.5 text-blue-300" />
+                      </div>
+                      <span className="font-bold text-blue-200">விவசாயி</span>
                       {msg.district && (
                         <span className="text-[11px] text-gray-400">
                           ({msg.district} · {msg.crop})
@@ -642,9 +676,11 @@ export default function AgriChatEngine() {
                     </>
                   ) : (
                     <>
-                      <Bot className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="font-semibold text-emerald-300">உழவன் சகாயக்</span>
-                      <span className="text-[11px] text-gray-400 font-mono">TNAU</span>
+                      <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center">
+                        <Bot className="w-3.5 h-3.5 text-amber-400" />
+                      </div>
+                      <span className="font-bold text-amber-300">உழவன் சகாயக் AI</span>
+                      <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 font-mono rounded">TNAU</span>
                     </>
                   )}
                 </div>
@@ -656,11 +692,11 @@ export default function AgriChatEngine() {
 
               {/* If farmer sent an image */}
               {msg.image_url && (
-                <div className="mb-2.5">
+                <div className="mb-3">
                   <img
                     src={msg.image_url}
                     alt="Farmer Crop Upload"
-                    className="max-w-[220px] max-h-[160px] rounded-xl border border-white/20 object-cover shadow-md"
+                    className="max-w-[260px] max-h-[180px] rounded-xl border border-amber-400/40 object-cover shadow-lg"
                   />
                 </div>
               )}
@@ -669,30 +705,30 @@ export default function AgriChatEngine() {
               <div className="text-sm md:text-[14.5px] leading-relaxed tamil-text font-normal">
                 <FormattedMarkdownText
                   text={msg.text}
-                  boldClassName={msg.sender === 'farmer' ? 'font-bold text-white' : 'font-bold text-emerald-300'}
-                  italicClassName="font-medium text-amber-200"
+                  boldClassName={msg.sender === 'farmer' ? 'font-bold text-white' : 'font-bold text-amber-300'}
+                  italicClassName="font-medium text-blue-200"
                 />
               </div>
 
               {/* Visual Observations Card in Assistant Message */}
               {msg.sender === 'assistant' && msg.visual_observations && msg.visual_observations.has_image && (
-                <div className="mt-2.5 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/25 flex items-start gap-2.5 text-xs text-gray-200">
+                <div className="mt-3 p-3 rounded-xl bg-slate-900/80 border border-emerald-500/30 flex items-start gap-2.5 text-xs text-gray-200 shadow-sm">
                   <span className="text-base shrink-0">📷</span>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-emerald-300">
-                        காட்சி பகுப்பாய்வு ({msg.visual_observations.crop}):
+                      <span className="font-bold text-emerald-300">
+                        காட்சிப் பகுப்பாய்வு ({msg.visual_observations.crop}):
                       </span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                        msg.visual_observations.confidence === 'high' ? 'bg-emerald-500/20 text-emerald-300' :
-                        msg.visual_observations.confidence === 'medium' ? 'bg-amber-500/20 text-amber-300' :
-                        'bg-rose-500/20 text-rose-300'
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${
+                        msg.visual_observations.confidence === 'high' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+                        msg.visual_observations.confidence === 'medium' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                        'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                       }`}>
                         Confidence: {msg.visual_observations.confidence}
                       </span>
                     </div>
                     {msg.visual_observations.summary_ta && (
-                      <p className="text-gray-300 tamil-text">{msg.visual_observations.summary_ta}</p>
+                      <p className="text-gray-200 tamil-text">{msg.visual_observations.summary_ta}</p>
                     )}
                     {msg.visual_observations.observations && msg.visual_observations.observations.length > 0 && (
                       <ul className="list-disc list-inside text-[11px] text-gray-400 space-y-0.5">
@@ -707,12 +743,12 @@ export default function AgriChatEngine() {
 
               {/* Bot Message Accessories */}
               {msg.sender === 'assistant' && (
-                <div className="mt-3 pt-3 border-t border-white/5 space-y-2.5">
+                <div className="mt-3 pt-3 border-t border-white/10 space-y-2.5">
                   
                   {/* Sources tag if available */}
                   {msg.sources && msg.sources.length > 0 && (
-                    <div className="flex items-center space-x-1.5 text-xs text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded-md border border-emerald-500/20 w-fit">
-                      <span className="font-semibold">📚 ஆதாரம்:</span>
+                    <div className="flex items-center space-x-1.5 text-xs text-amber-300 bg-amber-950/40 px-2.5 py-1 rounded-lg border border-amber-500/25 w-fit">
+                      <span className="font-bold">📚 பரிந்துரை ஆதாரம்:</span>
                       <span className="text-gray-300">{msg.sources[0]?.source || 'TNAU Agritech Portal & ICAR'}</span>
                     </div>
                   )}
@@ -723,15 +759,15 @@ export default function AgriChatEngine() {
 
                     <div className="flex items-center space-x-2">
                       {msg.audio_status === 'processing' ? (
-                        <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-amber-300/90 bg-amber-950/40 border border-amber-500/20 animate-pulse">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                          <span>🔊 Preparing Tamil audio...</span>
+                        <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 bg-amber-950/50 border border-amber-500/30 animate-pulse">
+                          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                          <span>🔊 தமிழ் குரல் தயாராகிறது...</span>
                         </span>
                       ) : msg.audio_status === 'failed' ? (
                         <button
                           onClick={() => fallbackSpeechSynthesis(msg.id, msg.text)}
                           title="Web Speech API மூலம் கேட்க"
-                          className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-white/5 transition-colors"
+                          className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-white/10 transition-colors"
                         >
                           <VolumeX className="w-3.5 h-3.5 text-rose-400" />
                           <span>🔊 Audio unavailable</span>
@@ -739,21 +775,21 @@ export default function AgriChatEngine() {
                       ) : (
                         <button
                           onClick={() => toggleTTS(msg.id, msg.text, msg.audio_url)}
-                          className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                          className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
                             activeTTSId === msg.id
-                              ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
-                              : 'text-gray-300 hover:text-emerald-300 hover:bg-white/5 border border-white/10'
+                              ? 'bg-rose-950 text-rose-300 border border-rose-500/50 shadow-rose-950/50'
+                              : 'bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 border border-amber-500/40 hover:scale-[1.02]'
                           }`}
                         >
                           {activeTTSId === msg.id ? (
                             <>
-                              <VolumeX className="w-3.5 h-3.5 text-rose-400" />
-                              <span>⏹️ நிறுத்து</span>
+                              <VolumeX className="w-4 h-4 text-rose-400" />
+                              <span>⏹️ குரலை நிறுத்து</span>
                             </>
                           ) : (
                             <>
-                              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>▶ Play Tamil Answer</span>
+                              <Volume2 className="w-4 h-4 text-amber-400" />
+                              <span>▶ தமிழில் கேட்கவும் (Play Voice)</span>
                             </>
                           )}
                         </button>
@@ -764,7 +800,7 @@ export default function AgriChatEngine() {
                           onClick={() =>
                             setExpandedDiffId(expandedDiffId === msg.id ? null : msg.id)
                           }
-                          className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-gray-400 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                          className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium text-gray-300 hover:text-amber-300 hover:bg-white/5 border border-white/10 transition-colors"
                         >
                           <Layers className="w-3.5 h-3.5" />
                           <span>AI ஒப்பீடு</span>
@@ -780,11 +816,11 @@ export default function AgriChatEngine() {
 
                   {/* Actual Measured Telemetry Strip */}
                   {msg.telemetry && (
-                    <div className="text-[11px] font-mono text-gray-400 pt-1 flex flex-wrap items-center gap-2.5 bg-black/30 p-2 rounded-lg border border-white/5">
+                    <div className="text-[11px] font-mono text-gray-400 pt-1 flex flex-wrap items-center gap-2.5 bg-black/40 p-2.5 rounded-xl border border-white/5">
                       {msg.telemetry.response_ms !== undefined || msg.telemetry.total_ms !== undefined ? (
                         <>
-                          <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                            <span>⚡ Response:</span> {(((msg.telemetry.response_ms ?? msg.telemetry.total_ms) || 0) / 1000).toFixed(2)}s
+                          <span className="text-amber-300 font-bold flex items-center gap-1">
+                            <span>⚡ வேகம்:</span> {(((msg.telemetry.response_ms ?? msg.telemetry.total_ms) || 0) / 1000).toFixed(2)}s
                           </span>
                           <span>·</span>
                           <span className="text-gray-300">🤖 {msg.model || 'Groq'}</span>
@@ -797,11 +833,11 @@ export default function AgriChatEngine() {
                           <span>·</span>
                           <span>📚 RAG {msg.telemetry.rag_ms ?? 0}ms</span>
                           <span>·</span>
-                          <span>🛡️ Safety {msg.telemetry.safety_ms ?? 0}ms</span>
+                          <span className="text-emerald-400">🛡️ Safety {msg.telemetry.safety_ms ?? 0}ms</span>
                           {msg.telemetry.tts_ms !== undefined && msg.telemetry.tts_ms !== null ? (
                             <>
                               <span>·</span>
-                              <span>🔊 TTS {msg.telemetry.tts_ms}ms</span>
+                              <span className="text-amber-300">🔊 TTS {msg.telemetry.tts_ms}ms</span>
                             </>
                           ) : null}
                           {msg.telemetry.fallback_used && (
@@ -827,8 +863,8 @@ export default function AgriChatEngine() {
 
                   {/* Inline Side-by-Side Model Diff Arena */}
                   {expandedDiffId === msg.id && msg.genericResponse && (
-                    <div className="mt-2 p-3 rounded-lg bg-black/40 border border-amber-500/20 space-y-1.5 animate-message">
-                      <div className="flex items-center justify-between text-xs text-amber-300 font-medium">
+                    <div className="mt-2 p-3 rounded-xl bg-black/50 border border-amber-500/30 space-y-1.5 animate-message">
+                      <div className="flex items-center justify-between text-xs text-amber-300 font-bold">
                         <span className="flex items-center gap-1.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
                           பொதுவான Base LLM பதில்
@@ -855,14 +891,16 @@ export default function AgriChatEngine() {
         {/* Loading Indicator */}
         {loading && (
           <div className="flex items-start space-x-3 animate-message">
-            <div className="w-7 h-7 rounded-lg bg-emerald-950 border border-emerald-500/30 flex items-center justify-center text-xs">
+            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-amber-500/40 flex items-center justify-center text-sm shadow-md">
               🌾
             </div>
-            <div className="p-3 rounded-xl bg-[#09150e] border border-white/10 flex items-center space-x-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" />
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.2s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.4s]" />
-              <span className="text-xs text-gray-400 font-mono ml-1">ஆலோசனை பெறப்படுகிறது...</span>
+            <div className="p-3.5 rounded-2xl bg-[#0b1736] border border-blue-500/30 flex items-center space-x-2.5 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]" />
+              <span className="text-xs text-amber-200 font-semibold font-tamil ml-1">
+                TNAU agronomy அறிவுத்தளத்திலிருந்து ஆலோசனை பெறப்படுகிறது...
+              </span>
             </div>
           </div>
         )}
@@ -870,10 +908,11 @@ export default function AgriChatEngine() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Clean Minimal Suggestion Links (No loud pills) */}
-      <div className="px-4 py-2 bg-[#050e07] border-t border-white/5 flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
-        <span className="text-[11px] text-gray-500 whitespace-nowrap">
-          மாதிரிகள்:
+      {/* Suggested Quick-Prompt Action Cards (Large, Easy to Tap for Farmers) */}
+      <div className="px-4 py-2.5 bg-[#060c1c] border-t border-blue-500/15 flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
+        <span className="text-[11px] font-bold text-amber-400/90 whitespace-nowrap mr-1 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          விரைவு வழிகாட்டல்:
         </span>
         {SAMPLE_PROMPTS.map((p, idx) => (
           <button
@@ -884,15 +923,16 @@ export default function AgriChatEngine() {
               setInputQuery(p.query)
               handleSendMessage(p.query)
             }}
-            className="text-gray-400 hover:text-emerald-300 text-[11px] whitespace-nowrap transition-colors underline decoration-gray-700 hover:decoration-emerald-400 underline-offset-4"
+            className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-blue-500/25 hover:border-amber-500/50 text-gray-200 hover:text-amber-200 text-xs font-semibold whitespace-nowrap transition-all shadow-sm flex items-center gap-1.5"
           >
-            {p.title}
+            <span>🌿</span>
+            <span>{p.title}</span>
           </button>
         ))}
       </div>
 
-      {/* Clean Capsule Input Bar */}
-      <div className="p-3 bg-[#061009] border-t border-white/10 relative z-10">
+      {/* Clean Capsule Input Bar with Large Accessibility Buttons */}
+      <div className="p-3.5 bg-[#070e22] border-t border-blue-500/20 relative z-10">
         
         {/* Hidden File & Camera Inputs */}
         <input
@@ -913,23 +953,23 @@ export default function AgriChatEngine() {
 
         {/* Selected Image Preview Pill */}
         {selectedImage && (
-          <div className="mb-2 p-2 rounded-lg bg-emerald-950/70 border border-emerald-500/40 flex items-center justify-between gap-2 animate-message">
-            <div className="flex items-center gap-2">
+          <div className="mb-2.5 p-2.5 rounded-xl bg-blue-950/80 border border-amber-500/40 flex items-center justify-between gap-3 animate-message shadow-lg">
+            <div className="flex items-center gap-3">
               <img
                 src={selectedImage}
                 alt="Selected crop preview"
-                className="w-10 h-10 rounded object-cover border border-emerald-500/50"
+                className="w-12 h-12 rounded-lg object-cover border border-amber-400/60 shadow-md"
               />
               <div className="text-xs">
-                <span className="text-emerald-300 font-medium block">📷 பயிர் புகைப்படம் இணைக்கப்பட்டது</span>
-                <span className="text-[10px] text-gray-400">கேள்வி தட்டச்சு செய்து அனுப்பவும்</span>
+                <span className="text-amber-300 font-bold block">📷 பயிர் இலை புகைப்படம் இணைக்கப்பட்டது</span>
+                <span className="text-[11px] text-gray-300">கேள்வி தட்டச்சு செய்து அனுப்பவும் அல்லது நேரடியாக அனுப்பவும்</span>
               </div>
             </div>
             <button
               type="button"
               onClick={clearSelectedImage}
-              className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-rose-400 transition-colors"
-              title="படத்தை நீக்கு"
+              className="p-1.5 rounded-lg bg-white/10 hover:bg-rose-500/20 text-gray-300 hover:text-rose-300 transition-colors"
+              title="படத்தை நீக்கு (Remove image)"
             >
               <X className="w-4 h-4" />
             </button>
@@ -938,49 +978,49 @@ export default function AgriChatEngine() {
 
         {/* Audio Waveform when recording */}
         {isListening && (
-          <div className="mb-2 p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-between gap-3 animate-pulse">
-            <div className="flex items-center space-x-2 text-xs text-emerald-300">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              <span>தமிழில் பேசுங்கள்... உங்கள் குரலை கேட்கிறது</span>
+          <div className="mb-2.5 p-2.5 rounded-xl bg-amber-950/70 border border-amber-500/40 flex items-center justify-between gap-3 animate-pulse shadow-lg">
+            <div className="flex items-center space-x-2 text-xs text-amber-200 font-bold font-tamil">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+              <span>தமிழில் பேசுங்கள்... உங்கள் குரலை பதிவு செய்கிறது</span>
             </div>
-            <canvas ref={canvasRef} width={100} height={16} className="rounded" />
+            <canvas ref={canvasRef} width={120} height={18} className="rounded" />
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 bg-[#09150e] border border-agro-500/25 rounded-xl p-1.5 focus-within:border-emerald-500/50 transition-all">
+        <div className="flex items-center gap-2 bg-[#0c1836] border border-blue-500/30 rounded-2xl p-2 focus-within:border-amber-500/60 focus-within:ring-1 focus-within:ring-amber-500/30 transition-all shadow-inner">
           
-          {/* Voice Mic Button */}
+          {/* Voice Mic Button (Big & Accessible) */}
           <button
             type="button"
             onClick={toggleSpeechRecognition}
-            title={isListening ? 'குரல் பதிவை நிறுத்து' : 'தமிழில் பேச கிளிக் செய்யவும்'}
-            className={`p-2 rounded-lg transition-colors ${
+            title={isListening ? 'குரல் பதிவை நிறுத்து' : 'தமிழில் பேச கிளிக் செய்யவும் (Speak in Tamil)'}
+            className={`p-2.5 rounded-xl transition-all ${
               isListening
-                ? 'bg-rose-500 text-white animate-pulse'
-                : 'text-gray-400 hover:text-emerald-300 hover:bg-white/5'
+                ? 'bg-rose-600 text-white animate-pulse shadow-md shadow-rose-600/30'
+                : 'text-amber-400 hover:text-white hover:bg-amber-500/20 bg-slate-900/60 border border-amber-500/20'
             }`}
           >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </button>
 
           {/* Upload Image Button */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title="பயிர் படம் பதிவேற்ற (Upload Image)"
-            className="p-2 rounded-lg text-gray-400 hover:text-emerald-300 hover:bg-white/5 transition-colors"
+            title="பயிர் படம் பதிவேற்ற (Upload Leaf Image)"
+            className="p-2.5 rounded-xl text-blue-300 hover:text-white hover:bg-blue-500/20 bg-slate-900/60 border border-blue-500/20 transition-all"
           >
-            <ImageIcon className="w-4 h-4" />
+            <ImageIcon className="w-5 h-5" />
           </button>
 
           {/* Camera Capture Button */}
           <button
             type="button"
             onClick={() => cameraInputRef.current?.click()}
-            title="பயிர் புகைப்படம் எடுக்க (Take Photo)"
-            className="p-2 rounded-lg text-gray-400 hover:text-emerald-300 hover:bg-white/5 transition-colors"
+            title="பயிர் புகைப்படம் எடுக்க (Take Photo with Camera)"
+            className="p-2.5 rounded-xl text-emerald-300 hover:text-white hover:bg-emerald-500/20 bg-slate-900/60 border border-emerald-500/20 transition-all"
           >
-            <Camera className="w-4 h-4" />
+            <Camera className="w-5 h-5" />
           </button>
 
           {/* Text Input Area */}
@@ -988,9 +1028,9 @@ export default function AgriChatEngine() {
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={selectedImage ? "படம் பற்றி கேள்வி அல்லது கூடுதல் தகவல் (விருப்பத்தேர்வு)..." : "உங்கள் பயிர் பிரச்சனையை தமிழில் தட்டச்சு செய்யவும்..."}
+            placeholder={selectedImage ? "படம் பற்றிய கேள்வி (எ.கா. இந்த இலையில் என்ன நோய்?)..." : "உங்கள் பயிர் பிரச்சனை அல்லது சந்தேகத்தை தமிழில் கேட்கவும்..."}
             rows={1}
-            className="flex-1 bg-transparent border-none outline-none text-xs md:text-sm text-gray-100 placeholder-gray-500 resize-none py-1.5 px-2 max-h-24 tamil-text"
+            className="flex-1 bg-transparent border-none outline-none text-xs md:text-sm text-gray-100 placeholder-gray-400 resize-none py-2 px-2.5 max-h-24 tamil-text"
           />
 
           {/* Send Button */}
@@ -998,12 +1038,13 @@ export default function AgriChatEngine() {
             type="button"
             onClick={() => handleSendMessage()}
             disabled={(!inputQuery.trim() && !selectedImage) || loading}
-            className={`p-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-md ${
               (inputQuery.trim() || selectedImage) && !loading
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
-                : 'text-gray-600 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 cursor-pointer shadow-amber-500/20 hover:scale-[1.02]'
+                : 'bg-slate-800 text-gray-500 cursor-not-allowed border border-white/5'
             }`}
           >
+            <span className="text-xs font-tamil hidden sm:inline">அனுப்பு</span>
             <Send className="w-4 h-4" />
           </button>
 
