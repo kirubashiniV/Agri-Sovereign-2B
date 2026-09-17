@@ -22,9 +22,10 @@ export default function SafetyShieldBadge({ safety }: SafetyShieldBadgeProps) {
   const [expanded, setExpanded] = useState(false)
   if (!safety) return null
 
-  const status = safety.status || safety.verdict || 'PASS'
+  const status = (safety.status || safety.verdict || 'PASS').toUpperCase()
   const isPass = status === 'PASS'
-  const isFail = status === 'FAIL'
+  const isBlock = status === 'FAIL' || status === 'BLOCK'
+  const isReview = status === 'REVIEW'
   const hasDetails = (safety.banned_chemicals_found && safety.banned_chemicals_found.length > 0) ||
                      (safety.dosage_flags && safety.dosage_flags.length > 0)
 
@@ -37,21 +38,22 @@ export default function SafetyShieldBadge({ safety }: SafetyShieldBadgeProps) {
         } ${
           isPass
             ? 'bg-emerald-950/60 border border-emerald-500/30 text-emerald-300'
-            : isFail
+            : isBlock
             ? 'bg-rose-950/60 border border-rose-500/30 text-rose-300'
             : 'bg-amber-950/60 border border-amber-500/30 text-amber-300'
         }`}
       >
         {isPass ? (
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-        ) : isFail ? (
+        ) : isBlock ? (
           <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
         ) : (
           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
         )}
 
         <span>
-          CIBRC {status}: {safety.verdict_tamil || (isPass ? 'பாதுகாப்பான பரிந்துரை' : 'எச்சரிக்கை')}
+          Safety Shield: {isPass ? 'PASS' : isBlock ? 'BLOCK' : 'REVIEW'}
+          {safety.verdict_tamil ? ` (${safety.verdict_tamil})` : ''}
         </span>
 
         {hasDetails && (

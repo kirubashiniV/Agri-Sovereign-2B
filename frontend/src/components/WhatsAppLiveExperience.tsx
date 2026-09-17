@@ -544,7 +544,6 @@ export default function WhatsAppLiveExperience() {
                   />
                 </div>
 
-                {/* Time & Read Receipts */}
                 <div className="flex items-center justify-end space-x-1 mt-1 text-[10px] text-gray-400 font-mono">
                   <span suppressHydrationWarning>{m.time}</span>
                   {m.isMe && (
