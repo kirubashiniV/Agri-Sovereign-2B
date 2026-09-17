@@ -649,7 +649,7 @@ export default function AgriChatEngine() {
                   )}
                 </div>
 
-                <div suppressHydrationWarning className="text-[11px] text-gray-400 font-mono">
+                <div className="text-[11px] text-gray-400 font-mono" suppressHydrationWarning>
                   {msg.timestamp}
                 </div>
               </div>
