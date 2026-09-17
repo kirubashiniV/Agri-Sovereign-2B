@@ -92,9 +92,11 @@ class CIBRCSafetyValidator:
             for c in clauses:
                 if any(alias in c for alias in chem_aliases):
                     detected_chemicals.append(chem_name)
-                    # Find dosage within this specific clause
+                    # Find dosage within this specific clause (support both '<dose> ml/l' and 'litre-ku <dose> ml')
                     litre_matches = re.findall(r'(?<!\S)(\d+(?:\.\d+)?)\s*(?:ml|m\.l|மில்லி|கிராம்|g|gm)\s*(?:/|per|ஒரு|1)\s*(?:லிட்டர்|litre|liter)', c)
-                    for dose_str in litre_matches:
+                    litre_first_matches = re.findall(r'(?:லிட்டர்|litre|liter|ஒரு லிட்டர்)\s*(?:தண்ணீருக்கு|நீருக்கு|க்கு)?\s*(\d+(?:\.\d+)?)\s*(?:ml|m\.l|மில்லி|கிராம்|g|gm)', c)
+                    all_matches = litre_matches + litre_first_matches
+                    for dose_str in all_matches:
                         try:
                             dose = float(dose_str)
                             min_d, max_d = spec["safe_dosage_ml_per_litre"]

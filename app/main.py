@@ -8,8 +8,9 @@ FastAPI Backend with:
 5. Real-Time Tokenizer Fertility & Telemetry Dashboard
 """
 
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import time
@@ -17,13 +18,29 @@ import sys
 import os
 import json
 import urllib.request
+from typing import Optional, List, Dict, Any
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "scripts"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "services"))
+
 from safety_validator import CIBRCSafetyValidator
 from build_agricultural_rag import AgriculturalRAGEngine
 from agri_sovereign_inference import AgriSovereignInferenceEngine
+from services.llm_provider import get_llm_provider
+from services.speech_service import speech_service, TamilSpeechNormalizer, STATIC_AUDIO_DIR
+from services.vision_service import vision_observer
 
 app = FastAPI(title="Agri-Sovereign Uzhavan-Sahayak", version="2.0.0")
+
+# Mount static audio files
+os.makedirs(STATIC_AUDIO_DIR, exist_ok=True)
+app.mount("/audio", StaticFiles(directory=STATIC_AUDIO_DIR), name="audio")
 
 # Enable CORS for Next.js frontend
 app.add_middleware(
@@ -37,35 +54,214 @@ app.add_middleware(
 safety_validator = CIBRCSafetyValidator()
 rag_engine = AgriculturalRAGEngine()
 inference_engine = AgriSovereignInferenceEngine()
+llm_provider = get_llm_provider()
+
+@app.get("/health")
+@app.get("/api/health")
+def health_check():
+    return {"status": "healthy", "service": "Uzhavan-Sahayak Agri-Sovereign API"}
 
 class QueryRequest(BaseModel):
-    query: str
-    crop: str = "Maize"
-    district: str = "Coimbatore"
-    mode: str = "agri_sovereign"  # "base_llm" or "agri_sovereign"
+    text: Optional[str] = None
+    query: Optional[str] = None  # Backward-compatible
+    image: Optional[str] = None
+    image_base64: Optional[str] = None
+    crop: Optional[str] = "Maize"
+    district: Optional[str] = "Coimbatore"
+    mode: Optional[str] = "agri_sovereign"  # "agri_sovereign" or "generic" or "farmer"
+    model_mode: Optional[str] = None
 
 class WhatsAppSendRequest(BaseModel):
     to: str
     message: str
 
+class TTSRequest(BaseModel):
+    text: str
+
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
     return HTML_CONTENT
 
+@app.get("/api/tts/{audio_id}")
+async def get_tts_status(audio_id: str):
+    """Poll status of background TTS audio generation."""
+    return speech_service.get_status(audio_id)
+
+@app.post("/api/tts")
+async def handle_tts(req: TTSRequest):
+    """Generates Tamil speech audio for the provided text."""
+    res = await speech_service.synthesize(req.text)
+    return res
+
 @app.post("/api/query")
-async def process_query(req: QueryRequest):
-    query = req.query.strip()
-    if not query:
-        return JSONResponse({"error": "Empty query"}, status_code=400)
+async def process_query(req: QueryRequest, background_tasks: BackgroundTasks):
+    t_start = time.monotonic()
     
-    # Run local GPU neural inference pipeline
-    result = inference_engine.generate(
-        query=query,
-        crop=req.crop,
-        district=req.district,
-        mode=req.mode
+    # 1. Input normalization
+    query_text = (req.text or req.query or "").strip()
+    image_input = req.image or req.image_base64
+    
+    if not query_text and not image_input:
+        return JSONResponse({"error": "Empty query and no image provided"}, status_code=400)
+    
+    # 2. Multimodal Vision Symptom Observation (if image provided)
+    visual_obs = None
+    vision_ms = 0.0
+    if image_input:
+        visual_obs = vision_observer.extract_observations(
+            image_base64=image_input,
+            user_query=query_text,
+            crop_hint=req.crop
+        )
+        vision_ms = visual_obs.get("vision_ms", 0.0)
+        if not query_text:
+            detected_c = visual_obs.get("crop", req.crop or "பயிர்")
+            query_text = f"{detected_c} பயிர் இலை பாதிப்பு அறிகுறிகள்"
+    
+    # 3. Local TNAU RAG Retrieval (FIRST/SECOND)
+    t_rag0 = time.monotonic()
+    rag_search_query = query_text
+    if visual_obs and visual_obs.get("has_image"):
+        obs_text = " ".join(visual_obs.get("observations", []))
+        rag_search_query = f"{visual_obs.get('crop', req.crop or '')} {obs_text} {query_text}".strip()
+        
+    docs = rag_engine.search(rag_search_query, top_k=2)
+    rag_ms = round((time.monotonic() - t_rag0) * 1000, 2)
+    
+    # 4. Grounded LLM Prompt & Generation (THIRD)
+    system_prompt = (
+        "You are Uzhavan-Sahayak (உழவன் சகாயக்), an expert agricultural AI assistant for Tamil Nadu farmers. "
+        "Answer fluently and politely in natural Tamil. Ground all pesticide, fertilizer, biological management, "
+        "and Pre-Harvest Interval (PHI) advice strictly in the provided TNAU/ICAR research documents. "
+        "Do NOT invent unverified dosages or mention banned chemicals unless explicitly warning against them. "
+        "If visual symptoms are unclear or confidence is low, communicate uncertainty politely in Tamil: "
+        "'படத்தில் அறிகுறிகள் தெளிவாக இல்லை. அருகிலிருந்து தெளிவான புகைப்படத்தை வழங்கவும்.' and provide general diagnostic advice."
     )
-    return result
+    user_prompt = f"மாவட்டம்: {req.district or 'Coimbatore'} | பயிர்: {req.crop or 'Maize'}\n"
+    if visual_obs and visual_obs.get("has_image"):
+        obs_list = visual_obs.get("observations", [])
+        obs_desc = ", ".join(obs_list) if obs_list else "அறிகுறிகள் ஆராயப்பட்டன"
+        user_prompt += (
+            f"[பயிர் புகைப்பட பகுப்பாய்வு (Visual Observations)]:\n"
+            f"- பயிர்: {visual_obs.get('crop')}\n"
+            f"- அறிகுறிகள்: {obs_desc}\n"
+            f"- தெளிவு நிலை: {visual_obs.get('confidence')}\n"
+            f"- தமிழ் விளக்கம்: {visual_obs.get('summary_ta')}\n\n"
+        )
+    user_prompt += f"விவசாயி கேள்வி: {query_text}"
+    
+    # Mode handling: if generic/base requested without grounding
+    req_mode = req.mode or req.model_mode or "agri_sovereign"
+    context_to_send = docs if req_mode in ("agri_sovereign", "farmer", "adapted") else None
+    
+    llm_result = await llm_provider.generate(
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        context=context_to_send,
+        image_base64=None
+    )
+    llm_ms = llm_result.get("latency_ms", 0.0)
+    raw_answer = llm_result.get("text", "")
+    
+    # 5. Deterministic CIBRC Safety Validation (FOURTH)
+    t_safe0 = time.monotonic()
+    query_safety = safety_validator.validate(query_text)
+    safety_result = safety_validator.validate(raw_answer)
+    
+    if query_safety.get("status") == "FAIL":
+        safety_result = query_safety
+        is_safe = False
+    else:
+        is_safe = (safety_result.get("status") == "PASS")
+        
+    status_str = "PASS" if is_safe else "FAIL"
+    safety_ms = round((time.monotonic() - t_safe0) * 1000, 2)
+    
+    banned_chemicals_found = [
+        f.get("chemical", "") for f in safety_result.get("flags", [])
+        if f.get("type") == "BANNED_SUBSTANCE"
+    ]
+    dosage_flags = [
+        f.get("reason", "") for f in safety_result.get("flags", [])
+        if f.get("type") == "OVERDOSAGE_ALERT"
+    ]
+    
+    answer_ta = raw_answer
+    if not is_safe:
+        flags_desc = " | ".join([f"{f.get('chemical', '')}: {f.get('reason', '')}" for f in safety_result.get("flags", [])])
+        banned_names = ", ".join(list(set([c.capitalize() for c in banned_chemicals_found]))) or "தடைசெய்யப்பட்ட பூச்சிக்கொல்லி"
+        answer_ta = (
+            f"⛔ **CIBRC சட்டப்பூர்வ பாதுகாப்பு எச்சரிக்கை ({banned_names})**\n\n"
+            f"**{banned_names}** இந்தியாவில் பயிர்களுக்குப் பயன்படுத்த **மத்திய பூச்சிக்கொல்லி வாரியத்தால் (CIBRC) முழுமையாக தடைசெய்யப்பட்டுள்ளது / கட்டுப்படுத்தப்பட்டுள்ளது**.\n\n"
+            f"⚠️ **காரணம்**: {flags_desc}\n\n"
+            f"💡 **பாதுகாப்பான மாற்றுப் பரிந்துரை**: TNAU வழிகாட்டுதலின்படி அங்கீகரிக்கப்பட்ட வேப்பங்கொட்டைச் சாறு (5%) அல்லது Chlorantraniliprole 18.5% SC (0.4 மில்லி/லிட்டர்) / Emamectin Benzoate 5% SG (0.5 கிராம்/லிட்டர்) ஆகியவற்றைப் பயன்படுத்தவும்."
+        )
+    
+    # 6. Tamil Speech Normalization & Non-Blocking Asynchronous Audio Scheduling (FIFTH)
+    spoken_ta = TamilSpeechNormalizer.create_spoken_ta(answer_ta)
+    audio_info = speech_service.get_audio_info(spoken_ta, is_already_normalized=True)
+    audio_id = audio_info.get("audio_id")
+    audio_url = audio_info.get("audio_url")
+    audio_status = audio_info.get("audio_status", "processing")
+    
+    # If not already cached, enqueue background task to generate audio without delaying HTTP response
+    if audio_status == "processing" and audio_id:
+        background_tasks.add_task(speech_service.synthesize_async_task, audio_id, spoken_ta)
+        
+    tts_ms = audio_info.get("tts_ms") if audio_info.get("cached") else None
+    
+    # 7. Build structured sources from authoritative docs
+    sources = []
+    if docs:
+        for d in docs:
+            sources.append({
+                "title": f"{d.get('crop', '')} — {d.get('pest_disease', '')}",
+                "source": "TNAU Agritech Portal & ICAR",
+                "url": "https://agritech.tnau.ac.in",
+                "id": d.get("id", "")
+            })
+            
+    response_ms = round((time.monotonic() - t_start) * 1000, 2)
+    
+    # Standardized contract with backward compatibility
+    return {
+        "answer_ta": answer_ta,
+        "spoken_ta": spoken_ta,
+        "audio_id": audio_id,
+        "audio_url": audio_url,
+        "audio_status": audio_status,
+        "sources": sources,
+        "visual_observations": visual_obs,
+        "safety": {
+            "status": status_str,
+            "verdict": status_str,
+            "verdict_tamil": "CIBRC சட்டப்பூர்வ அனுமதி சரிபார்க்கப்பட்டது" if is_safe else "CIBRC தடைசெய்யப்பட்ட மருந்து / விதிமீறல்",
+            "warnings": safety_result.get("flags", []),
+            "banned_chemicals_found": banned_chemicals_found,
+            "dosage_flags": dosage_flags,
+            "phi_warnings": safety_result.get("phi_warnings", []),
+            "statutory_basis": "Insecticides Act, 1968 / CIBRC Gazette 2024",
+            "detected_chemicals": safety_result.get("detected_chemicals", []),
+            "is_safe": is_safe
+        },
+        "model": f"{llm_result.get('provider')} ({llm_result.get('model')})",
+        "telemetry": {
+            "vision_ms": vision_ms,
+            "rag_ms": rag_ms,
+            "llm_ms": llm_ms,
+            "safety_ms": safety_ms,
+            "response_ms": response_ms,
+            "total_ms": response_ms,
+            "tts_ms": tts_ms,
+            "input_tokens": llm_result.get("input_tokens"),
+            "output_tokens": llm_result.get("output_tokens"),
+            "fallback_used": llm_result.get("fallback_used", False)
+        },
+        # Backward-compatible fields for existing UI components:
+        "response": answer_ta,
+        "mode": req_mode,
+        "evidence": docs[0] if docs else None
+    }
 
 @app.get("/api/benchmark/fertility")
 async def get_fertility_benchmark():

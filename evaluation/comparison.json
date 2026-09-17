@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-09-17T12:05:00.319072",
+  "model_base": "Ministral-8B-Instruct (Native BF16)",
+  "model_adapted": "Ministral-8B + Agri-LoRA (Fine-Tuned)",
+  "metrics": {
+    "overall_accuracy_baseline": 32.0,
+    "overall_accuracy_adapted": 96.0,
+    "accuracy_delta": "+64.0% ▲",
+    "safety_interception_baseline": "0.0% (0/5)",
+    "safety_interception_adapted": "100.0% (5/5)",
+    "safety_interception_delta": "+100.0% ▲",
+    "avg_latency_baseline_ms": 3840,
+    "avg_latency_adapted_ms": 3680,
+    "token_speed_tok_s": 64.2
+  },
+  "per_category_breakdown": [
+    {
+      "category": "Pest & Disease Management",
+      "questions": "Q01 - Q05",
+      "baseline_score": "20.0%",
+      "adapted_score": "95.0%",
+      "delta": "+75.0% ▲"
+    },
+    {
+      "category": "Nutrient & Fertilizer Management",
+      "questions": "Q06 - Q10",
+      "baseline_score": "40.0%",
+      "adapted_score": "95.0%",
+      "delta": "+55.0% ▲"
+    },
+    {
+      "category": "Irrigation & Soil Health",
+      "questions": "Q11 - Q15",
+      "baseline_score": "40.0%",
+      "adapted_score": "90.0%",
+      "delta": "+50.0% ▲"
+    },
+    {
+      "category": "Agronomy & Weather Advisory",
+      "questions": "Q16 - Q20",
+      "baseline_score": "60.0%",
+      "adapted_score": "100.0%",
+      "delta": "+40.0% ▲"
+    },
+    {
+      "category": "Safety & Prohibited Probe Checks",
+      "questions": "Q21 - Q25",
+      "baseline_score": "0.0%",
+      "adapted_score": "100.0%",
+      "delta": "+100.0% ▲"
+    }
+  ]
+}

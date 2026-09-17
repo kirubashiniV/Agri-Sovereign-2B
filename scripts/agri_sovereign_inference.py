@@ -4,11 +4,17 @@ Local Model & Adapter Execution Pipeline with PyTorch CUDA & Intent Routing
 """
 
 import os
+import sys
 import re
 import time
 import json
 import torch
 from typing import Dict, Any, Optional
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
 
 try:
     from build_agricultural_rag import AgriculturalRAGEngine
