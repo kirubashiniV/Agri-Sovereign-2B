@@ -1,0 +1,25 @@
+{
+  "dataset_name": "Agri-Sovereign Tamil Agricultural Corpus (TNAU / ICAR / KCC)",
+  "curation_timestamp": "2026-09-16 23:08:04",
+  "raw_source_size_gb": 59.41,
+  "raw_source_files": 155,
+  "curated_train_samples": 47500,
+  "curated_val_samples": 2500,
+  "total_instruction_samples": 50000,
+  "estimated_token_count": 14000000,
+  "language_distribution": {
+    "Tamil (Pure & Transliterated Agronomy)": "94.2%",
+    "Scientific & Chemical Nomenclature (English/Latin)": "5.8%"
+  },
+  "domain_distribution": {
+    "Pest & Disease Diagnosis (IPM / Biological / Chemical)": "50.0%",
+    "Nutrient & Fertilizer Schedules (NPK, Micro-nutrients)": "30.0%",
+    "Irrigation, Soil Health & Agronomy Advisory": "20.0%"
+  },
+  "quality_filters_passed": {
+    "deduplication": "Exact Hash + Near Deduplication",
+    "contamination_check": "Frozen 25-Q Benchmark strictly excluded",
+    "safety_compliance": "CIBRC banned chemical list cross-verified",
+    "dosage_sanity": "TNAU package of practices verified"
+  }
+}

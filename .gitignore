@@ -1,4 +1,4 @@
-# Python & Environments
+# Python & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
@@ -24,7 +24,17 @@ wheels/
 .installed.cfg
 *.egg
 
-# Model Weights (>100MB limit for GitHub)
+# Large Datasets & Raw Files (>100MB)
+dataset/
+data/*.jsonl
+data/raw/
+data/processed/
+*.parquet
+*.arrow
+*.tar.gz
+*.zip
+
+# Large Model Weights (>100MB limit for GitHub)
 *.pt
 *.pth
 *.bin
@@ -33,12 +43,15 @@ wheels/
 *.h5
 *.tflite
 *.ckpt
-models/base_checkpoint/*
-!models/**/adapter_config.json
-!models/**/config.json
-!models/**/tokenizer_config.json
-!models/**/model_card.json
-!models/**/training_log.json
+models/base_checkpoint/
+models/checkpoints/
+models/agri_sovereign_2b/
+models/uzhavan_agri_adapter/
+models/final_adapter/*.safetensors
+
+# Logs & Runtime State
+logs/
+*.log
 
 # Node & Next.js Frontend
 node_modules/
