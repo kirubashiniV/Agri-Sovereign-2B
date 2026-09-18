@@ -11,6 +11,7 @@ import {
   X,
   Zap,
 } from 'lucide-react'
+import ThemeToggle from './ThemeToggle'
 
 interface SidebarProps {
   activeTab: string
@@ -60,60 +61,63 @@ export default function Sidebar({ activeTab, setActiveTab, gpuStatus }: SidebarP
 
   return (
     <>
-      {/* Mobile Top Header with Hamburger */}
-      <div className="md:hidden sticky top-0 z-50 glass-panel border-b border-agro-500/20 px-4 py-3 flex items-center justify-between shadow-xl">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-agro-700 to-emerald-400 flex items-center justify-center text-base shadow-md">
+      {/* Mobile Top Header with Hamburger & ThemeToggle */}
+      <div className="md:hidden sticky top-0 z-50 bg-[var(--bg-card)] border-b border-[var(--border)] px-4 py-2.5 flex items-center justify-between shadow-sm transition-colors duration-300">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary)] text-white flex items-center justify-center text-sm shadow-md">
             🌾
           </div>
           <div>
-            <h1 className="text-sm font-bold text-gray-100">Agri-Sovereign 2B</h1>
-            <p className="text-[10px] text-emerald-400">உழவன் சகாயக்</p>
+            <h1 className="text-sm font-bold text-[var(--text-primary)]">Agri-Sovereign 2B</h1>
+            <p className="text-[10px] text-[var(--accent-primary)] font-medium">உழவன் சகாயக்</p>
           </div>
         </div>
 
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-xl bg-agro-950/80 border border-agro-500/30 text-emerald-300"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center space-x-2">
+          <ThemeToggle />
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border)] text-[var(--text-primary)]"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Backdrop for Mobile */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/80 z-40 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-72 bg-[#061009]/95 border-r border-agro-500/20 flex flex-col justify-between p-4 transition-transform duration-300 ease-in-out ${
+        className={`fixed md:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-[var(--bg-card)] border-r border-[var(--border)] shadow-[4px_0_20px_-4px_rgba(0,0,0,0.06),1px_0_3px_rgba(0,0,0,0.02)] flex flex-col justify-between p-4 transition-all duration-300 ease-in-out ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Top Logo & Title */}
         <div className="space-y-6">
           <div className="flex items-center space-x-3 px-2 pt-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-agro-600 to-emerald-400 flex items-center justify-center text-xl shadow-lg shadow-agro-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--accent-secondary)] to-[var(--accent-primary)] text-white flex items-center justify-center text-xl shadow-md">
               🌾
             </div>
             <div>
-              <h1 className="text-base font-bold text-gray-100 tracking-tight flex items-center gap-1.5">
+              <h1 className="text-base font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-1.5">
                 Agri-Sovereign
-                <span className="text-[10px] font-mono text-emerald-400 font-normal">2B</span>
+                <span className="text-[10px] font-mono text-[var(--accent-primary)] font-semibold">2B</span>
               </h1>
-              <p className="text-xs text-emerald-400/90 font-medium">உழவன் சகாயக்</p>
+              <p className="text-xs text-[var(--accent-primary)] font-medium">உழவன் சகாயக்</p>
             </div>
           </div>
 
-          {/* Navigation Links (Clean, No Noisy Pills) */}
-          <nav className="space-y-1">
-            <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-              பயன்பாட்டு பிரிவுகள்
+          {/* Navigation Links */}
+          <nav className="space-y-1.5">
+            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+              பயன்பாட்டு பிரிவுகள் (Navigation)
             </div>
             {navItems.map((item) => {
               const Icon = item.icon
@@ -123,22 +127,22 @@ export default function Sidebar({ activeTab, setActiveTab, gpuStatus }: SidebarP
                 <button
                   key={item.id}
                   onClick={() => handleSelectTab(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-left transition-all ${
+                  className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? 'bg-emerald-950/70 border border-emerald-500/40 text-emerald-200 shadow-md'
-                      : 'text-gray-300 hover:text-gray-100 hover:bg-agro-950/40 border border-transparent'
+                      ? 'bg-[var(--accent-subtle)] border border-[var(--accent-primary)] text-[var(--text-primary)] shadow-sm font-semibold'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] border border-transparent'
                   }`}
                 >
                   <Icon
                     className={`w-5 h-5 shrink-0 ${
-                      isActive ? 'text-emerald-400' : 'text-gray-400'
+                      isActive ? 'text-[var(--accent-primary)]' : 'text-[var(--text-secondary)]'
                     }`}
                   />
                   <div className="min-w-0">
-                    <p className={`text-sm font-semibold truncate ${isActive ? 'text-white' : 'text-gray-200'}`}>
+                    <p className={`text-sm font-semibold truncate ${isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]'}`}>
                       {item.label}
                     </p>
-                    <p className="text-[11px] text-gray-400 truncate font-normal">
+                    <p className="text-[11px] text-[var(--text-secondary)] truncate font-normal">
                       {item.tamilLabel}
                     </p>
                   </div>
@@ -148,26 +152,26 @@ export default function Sidebar({ activeTab, setActiveTab, gpuStatus }: SidebarP
           </nav>
         </div>
 
-        {/* Clean, Subtle Hardware Telemetry Card (No visual clutter) */}
-        <div className="p-3.5 rounded-xl bg-black/40 border border-agro-500/15 space-y-2 text-xs">
-          <div className="flex items-center justify-between text-gray-400 font-mono text-[11px]">
-            <span className="flex items-center gap-1.5 text-emerald-400">
+        {/* Clean Subtle Hardware Telemetry Card */}
+        <div className="p-3.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border)] space-y-2 text-xs transition-colors duration-300">
+          <div className="flex items-center justify-between text-[var(--text-secondary)] font-mono text-[11px]">
+            <span className="flex items-center gap-1.5 text-[var(--accent-primary)] font-semibold">
               <Cpu className="w-3.5 h-3.5" /> RTX 3050 (6GB)
             </span>
-            <span className="text-emerald-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[var(--accent-primary)] flex items-center gap-1 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse" />
               Online
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-gray-300 pt-1 border-t border-white/5">
+          <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-[var(--text-secondary)] pt-1 border-t border-[var(--border)]">
             <div>
-              <span className="text-gray-500 block text-[10px]">Adapter</span>
-              <span>176 MB LoRA</span>
+              <span className="text-[var(--text-muted)] block text-[10px]">Adapter</span>
+              <span className="text-[var(--text-primary)] font-medium">176 MB LoRA</span>
             </div>
             <div>
-              <span className="text-gray-500 block text-[10px]">Efficiency</span>
-              <span className="text-emerald-400">89.6% Save</span>
+              <span className="text-[var(--text-muted)] block text-[10px]">Efficiency</span>
+              <span className="text-[var(--accent-primary)] font-bold">89.6% Save</span>
             </div>
           </div>
         </div>
